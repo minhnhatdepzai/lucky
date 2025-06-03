@@ -9,8 +9,8 @@ const segments = [
   { label: '500k', color: '#9ACD32', weight: 0 },
   { label: '50k', color: '#FFA500', weight: 0 },
   { label: '20k', color: '#FFFFE0', weight: 0 },
-  { label: '10k', color: '#006400', weight: 0 },
-  { label: 'Trả lời thêm câu nữa', color: '#FFA500', weight: 1 },
+  { label: 'Trả lời thêm câu nữa', color: '#006400', weight: 1 },
+  { label: 'Bắt tay với Lê Nhật', color: '#FFA500', weight: 1 },
   { label: 'Một tràng vỗ tay', color: '#FFFFE0', weight: 1 },
   { label: 'Được nhận xét phần thuyết trình', color: '#006400', weight: 1 },
 ];
@@ -20,8 +20,7 @@ const ctx = wheel.getContext('2d');
 let currentRotation = 0;
 let isSpinning = false;
 
-// 3 ô cuối được phép dừng
-const winningIndices = [7, 8, 9];
+const winningIndices = [7, 8, 9]; // 3 ô không tiền
 
 function drawWheel() {
   const centerX = wheel.width / 2;
@@ -76,7 +75,6 @@ function rotateWheel(angle) {
   ctx.restore();
 }
 
-// Tính index ô hiện tại theo góc quay (góc 0 độ kim chỉ sang trái)
 function getSegmentIndexFromRotation(rotation) {
   const degreesPerSegment = 360 / segments.length;
   const normalizedDegree = rotation % 360;
@@ -84,7 +82,6 @@ function getSegmentIndexFromRotation(rotation) {
   return Math.floor(pointerDegree / degreesPerSegment);
 }
 
-// Chọn ngẫu nhiên 1 ô trong 3 ô cuối (đều nhau)
 function weightedRandomSegment() {
   const totalWeight = winningIndices.length;
   let random = Math.floor(Math.random() * totalWeight);
@@ -97,57 +94,83 @@ function spin() {
   result.textContent = '';
 
   const degreesPerSegment = 360 / segments.length;
+  const chosenIndex = weightedRandomSegment();
+  const randomOffset = Math.random() * degreesPerSegment * 0.6 + degreesPerSegment * 0.2;
 
-  // Quay 1 lần, trả về Promise chứa index dừng
-  function doSpin() {
-    return new Promise((resolve) => {
-      const chosenIndex = weightedRandomSegment();
-      const randomOffset = Math.random() * degreesPerSegment * 0.6 + degreesPerSegment * 0.2;
+  let targetAngle =
+    360 * (3 + Math.random() * 2) +
+    (segments.length - chosenIndex - 1) * degreesPerSegment +
+    randomOffset;
 
-      const stopAngle =
-        360 * (3 + Math.random() * 2) +
-        (segments.length - chosenIndex - 1) * degreesPerSegment +
-        randomOffset;
+  const duration = 5000;
+  const startTime = performance.now();
+  const startRotation = currentRotation;
 
-      const duration = 5000;
-      const startTime = performance.now();
-      const startRotation = currentRotation;
+  function animateSpin(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
 
-      function animate(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeOut = 1 - Math.pow(1 - progress, 3);
+    currentRotation = startRotation + targetAngle * easeOut;
+    rotateWheel(currentRotation);
 
-        currentRotation = startRotation + stopAngle * easeOut;
-        rotateWheel(currentRotation);
+    if (progress < 1) {
+      requestAnimationFrame(animateSpin);
+    } else {
+      const stoppedIndex = getSegmentIndexFromRotation(currentRotation);
 
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // Xác định ô dừng
-          const stoppedIndex = getSegmentIndexFromRotation(currentRotation);
-          resolve(stoppedIndex);
-        }
-      }
-      animate(performance.now());
-    });
-  }
-
-  // Quay lại nếu dừng ô tiền
-  async function spinUntilWin() {
-    while (true) {
-      const stoppedIndex = await doSpin();
       if (winningIndices.includes(stoppedIndex)) {
         isSpinning = false;
         const segment = segments[stoppedIndex];
         result.textContent = `Xin chúc mừng, bạn đã nhận được ${segment.label}`;
-        break;
+      } else {
+        // Bắt đầu nhích từng ô đến ô không tiền
+        let currentIndex = stoppedIndex;
+
+        function step() {
+          currentIndex++;
+          if (currentIndex >= segments.length) currentIndex = 0;
+
+          const currentPos = currentRotation % 360;
+          const targetPos = (segments.length - currentIndex - 1) * degreesPerSegment + degreesPerSegment / 2;
+          let diff = (targetPos - currentPos + 360) % 360;
+
+          const stepDuration = 300;
+          const stepStartRotation = currentRotation;
+          const stepStartTime = performance.now();
+
+          function animateStep(time) {
+            const stepElapsed = time - stepStartTime;
+            const stepProgress = Math.min(stepElapsed / stepDuration, 1);
+            const easeStep = 1 - Math.pow(1 - stepProgress, 3);
+
+            currentRotation = stepStartRotation + diff * easeStep;
+            rotateWheel(currentRotation);
+
+            if (stepProgress < 1) {
+              requestAnimationFrame(animateStep);
+            } else {
+              // Nếu ô hiện tại là ô không tiền thì dừng, ngược lại tiếp tục nhích
+              if (winningIndices.includes(currentIndex)) {
+                isSpinning = false;
+                const segment = segments[currentIndex];
+                result.textContent = `Xin chúc mừng, bạn đã nhận được ${segment.label}`;
+              } else {
+                step();
+              }
+            }
+          }
+          requestAnimationFrame(animateStep);
+        }
+
+        step();
       }
     }
   }
 
-  spinUntilWin();
+  requestAnimationFrame(animateSpin);
 }
+
 
 drawWheel();
 spinBtn.addEventListener('click', spin);
