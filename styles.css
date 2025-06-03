@@ -1,0 +1,167 @@
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #fff;
+  background: url('doremon.jpg') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 1rem 0;
+}
+
+/* Main container */
+main {
+  max-width: 600px;
+  width: 100%;
+  background-color: rgba(18, 18, 18, 0.85);
+  border-radius: 15px;
+  padding: 2rem 1.5rem 3rem;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+}
+
+/* Hero section */
+.hero {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  color: #fff;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  font-size: 0.85rem;
+  color: #d0e7ff;
+}
+
+/* Wheel section */
+.wheel-section {
+  padding: 0;
+  background: transparent;
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.wheel-container {
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+#wheel {
+  max-width: 500px;
+  max-height: 500px;
+  border-radius: 50%;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.9);
+  background: #222;
+  display: block;
+  margin: 0 auto;
+}
+
+#spin-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #3498db;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 100;
+  transition: background-color 0.3s;
+  font-size: 14px;
+}
+
+#spin-btn:hover {
+  background: #2980b9;
+}
+
+/* Kim tam giác chỉ sang trái sát bánh xe */
+.pointer {
+  position: absolute;
+  top: 50%;
+  right: -3px; /* đẩy sát bánh xe */
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  z-index: 300;
+}
+
+.pointer::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  border-right: 35px solid #2c3e50;
+}
+
+/* Kết quả */
+.result {
+  font-size: 22px;
+  font-weight: bold;
+  height: 36px;
+  color: #00aaff;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  main {
+    max-width: 90vw;
+    padding: 1rem;
+  }
+
+  #wheel {
+    max-width: 300px;
+    max-height: 300px;
+  }
+
+  #spin-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 12px;
+  }
+
+  .pointer {
+    right: -25px;
+  }
+
+  .pointer::before {
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 22px solid #2c3e50;
+  }
+
+  .result {
+    font-size: 18px;
+    height: 30px;
+    margin-top: 0.8rem;
+  }
+}

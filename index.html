@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucky Spin - Random Number Wheel</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+  />
+  <style>
+    body {
+      background: url('doremon.jpg') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>Spin the Wheel of Fortune!</h1>
+      <p>Try your luck and see what number you'll get</p>
+    </section>
+
+    <section class="wheel-section">
+      <div class="container">
+        <div class="wheel-container">
+          <div class="pointer"></div>
+          <canvas id="wheel" width="500" height="500"></canvas>
+          <button id="spin-btn">SPIN</button>
+        </div>
+        <div class="result" id="result"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
